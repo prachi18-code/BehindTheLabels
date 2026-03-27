@@ -1,8 +1,11 @@
 {
   "expo": {
-    "name": "behindthetitle",
-    "slug": "behindthetitle",
+    "name": "EcoScan AI",
+    "slug": "ecoscan-ai",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -12,19 +15,48 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ecoscanai.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "EcoScan AI uses your camera to scan barcodes."
+      }
     },
     "android": {
+      "package": "com.ecoscanai.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "CAMERA",
+        "android.permission.CAMERA",
+        "CAMERA",
+        "android.permission.CAMERA"
+      ]
     },
+    "plugins": [
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "EcoScan AI uses your camera to scan barcodes.",
+          "enableCodeScanner": true
+        }
+      ]
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "cf6e464a-6a27-47dd-967c-6eea8ad719f4"
+      }
+    },
+    "owner": "mohit5050",
+    "updates": {
+      "url": "https://u.expo.dev/cf6e464a-6a27-47dd-967c-6eea8ad719f4"
     }
   }
 }
