@@ -10,6 +10,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (_req, res) => {
+  res.json({
+    success: true,
+    service: 'EcoScan AI Backend',
+    status: 'ok',
+    endpoints: ['/health', '/api/scan'],
+  });
+});
+
 app.get('/health', (_req, res) => {
   res.json({ success: true, status: 'ok' });
 });
