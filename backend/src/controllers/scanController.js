@@ -5,6 +5,10 @@ const {
   getCarbonValue,
   getEcoScore,
   getImpact,
+  evaluateSugar,
+  evaluateSaturatedFat,
+  evaluateNova,
+  generateSmartSummary,
 } = require('../utils/carbonLogic');
 
 const scanBarcodeController = async (req, res, next) => {
@@ -35,6 +39,11 @@ const scanBarcodeController = async (req, res, next) => {
 
     const carbonValue = getCarbonValue(product.categories, product.productName);
     const ecoScore = getEcoScore(carbonValue);
+    
+    const sugarLevel = evaluateSugar(product.sugar100g);
+    const saturatedFatLevel = evaluateSaturatedFat(product.saturatedFat100g);
+    const novaGroup = evaluateNova(product.novaGroup);
+    const smartSummary = generateSmartSummary(ecoScore, sugarLevel, saturatedFatLevel, novaGroup);
 
     const payload = {
       success: true,
@@ -44,6 +53,10 @@ const scanBarcodeController = async (req, res, next) => {
       ecoScore,
       impact: getImpact(carbonValue),
       alternatives: getAlternatives(product.categories, product.productName),
+      sugarLevel,
+      saturatedFatLevel,
+      novaGroup,
+      smartSummary,
     };
 
     saveScanHistory({

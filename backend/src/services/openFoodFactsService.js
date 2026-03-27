@@ -22,10 +22,19 @@ const fetchProductByBarcode = async (barcode) => {
     }
 
     const product = data.product;
+    const nutriments = product.nutriments || {};
+
+    const sugar100g = nutriments.sugars_100g ?? nutriments.sugars ?? null;
+    const saturatedFat100g = nutriments['saturated-fat_100g'] ?? nutriments['saturated-fat'] ?? null;
+    const novaGroup = product.nova_group ?? null;
+
     return {
       productName: product.product_name || 'Unknown Product',
       image: product.image_url || '',
       categories: product.categories || '',
+      sugar100g: sugar100g !== null ? Number(sugar100g) : null,
+      saturatedFat100g: saturatedFat100g !== null ? Number(saturatedFat100g) : null,
+      novaGroup: novaGroup !== null ? Number(novaGroup) : null,
     };
   } catch (error) {
     if (error?.name === 'AbortError') {

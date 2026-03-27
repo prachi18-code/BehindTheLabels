@@ -7,6 +7,10 @@ export interface ScanResponse {
   ecoScore: EcoScore;
   impact: string;
   alternatives: string[];
+  sugarLevel: string | null;
+  saturatedFatLevel: string | null;
+  novaGroup: string | null;
+  smartSummary: string;
 }
 
 export type RootStackParamList = {

@@ -15,7 +15,7 @@ import {
   View,
 } from 'react-native';
 
-import { EcoScoreBadge } from '../components/EcoScoreBadge';
+import { ProductAnalysisCard } from '../components/ProductAnalysisCard';
 import { fetchScanResult } from '../services/api';
 import { colors } from '../theme/colors';
 import type { RootStackParamList, ScanResponse } from '../types';
@@ -28,6 +28,10 @@ const fallbackData: ScanResponse = {
   carbonFootprint: 'N/A',
   ecoScore: 'C',
   impact: 'Equivalent to driving 0 km',
+  sugarLevel: null,
+  saturatedFatLevel: null,
+  novaGroup: null,
+  smartSummary: 'No analysis available for this product.',
   alternatives: [],
 };
 
@@ -121,7 +125,7 @@ export const ResultScreen = () => {
           </View>
           <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 16 }} />
           <Text style={styles.loaderTitle}>Analyzing Product</Text>
-          <Text style={styles.loaderSubtitle}>Fetching carbon footprint insights...</Text>
+          <Text style={styles.loaderSubtitle}>Fetching smart nutritional & impact data...</Text>
 
           {/* Skeleton placeholders */}
           <View style={styles.skeletonGroup}>
@@ -154,6 +158,11 @@ export const ResultScreen = () => {
           </View>
         </LinearGradient>
 
+        <View style={styles.productHeader}>
+          <Image source={{ uri: product.image }} style={styles.productImage} resizeMode="cover" />
+          <Text style={styles.productName}>{product.productName}</Text>
+        </View>
+
         {error ? (
           <View style={styles.errorCard}>
             <Text style={styles.errorEmoji}>⚠️</Text>
@@ -161,43 +170,9 @@ export const ResultScreen = () => {
           </View>
         ) : null}
 
-        <View style={styles.card}>
-          <Image source={{ uri: product.image }} style={styles.productImage} resizeMode="cover" />
-          <Text style={styles.productName}>{product.productName}</Text>
-          <View style={styles.metricsRow}>
-            <View style={styles.footprintContainer}>
-              <Text style={styles.sectionLabel}>Carbon Footprint</Text>
-              <Text style={styles.footprint}>{product.carbonFootprint}</Text>
-            </View>
-            <EcoScoreBadge score={product.ecoScore} />
-          </View>
-        </View>
+        {/* New Multi-Parameter Card */}
+        <ProductAnalysisCard product={product} />
 
-        <View style={styles.card}>
-          <Text style={styles.sectionLabel}>🚗 Environmental Impact</Text>
-          <Text style={styles.impactText}>{product.impact}</Text>
-        </View>
-
-        {product.alternatives.length > 0 && (
-          <View style={styles.card}>
-            <Text style={styles.sectionLabel}>🌱 Eco-Friendly Alternatives</Text>
-            {product.alternatives.map((item, index) => (
-              <View key={`${item}-${index}`} style={styles.alternativeRow}>
-                <View style={styles.altBadge}>
-                  <Text style={styles.altBadgeText}>{index + 1}</Text>
-                </View>
-                <Text style={styles.alternativeText}>{item}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {product.alternatives.length === 0 && !error && (
-          <View style={styles.card}>
-            <Text style={styles.sectionLabel}>🌱 Alternatives</Text>
-            <Text style={styles.muted}>No eco-friendly alternatives found for this product.</Text>
-          </View>
-        )}
       </Animated.ScrollView>
 
       <View style={styles.bottomActions}>
@@ -222,7 +197,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingTop: 56,
     paddingBottom: 110,
-    gap: 14,
+    gap: 16,
   },
 
   // Header
@@ -230,6 +205,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     paddingVertical: 18,
     paddingHorizontal: 20,
+    marginBottom: 8,
   },
   appTitle: {
     color: '#065F46',
@@ -248,6 +224,24 @@ const styles = StyleSheet.create({
     color: '#047857',
     fontSize: 13,
     fontWeight: '700',
+  },
+
+  productHeader: {
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  productImage: {
+    width: 140,
+    height: 140,
+    borderRadius: 20,
+    backgroundColor: '#E5E7EB',
+  },
+  productName: {
+    marginTop: 14,
+    color: colors.textPrimary,
+    fontSize: 22,
+    fontWeight: '900',
+    textAlign: 'center',
   },
 
   // Error
@@ -270,94 +264,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     lineHeight: 20,
-  },
-
-  // Cards
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 18,
-    shadowColor: 'rgba(15, 23, 42, 0.06)',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 1,
-    shadowRadius: 16,
-    elevation: 2,
-  },
-  productImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 16,
-    backgroundColor: '#E5E7EB',
-  },
-  productName: {
-    marginTop: 14,
-    color: colors.textPrimary,
-    fontSize: 24,
-    fontWeight: '900',
-    lineHeight: 30,
-  },
-  metricsRow: {
-    marginTop: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  footprintContainer: {
-    flex: 1,
-  },
-  sectionLabel: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-  },
-  footprint: {
-    marginTop: 8,
-    color: '#166534',
-    fontSize: 30,
-    fontWeight: '900',
-  },
-  impactText: {
-    marginTop: 10,
-    color: colors.textPrimary,
-    fontSize: 18,
-    fontWeight: '700',
-    lineHeight: 27,
-  },
-  muted: {
-    marginTop: 8,
-    color: colors.textSecondary,
-    fontSize: 15,
-    lineHeight: 22,
-  },
-
-  // Alternatives
-  alternativeRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  altBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 10,
-    backgroundColor: '#ECFDF5',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  altBadgeText: {
-    color: colors.primaryDark,
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  alternativeText: {
-    flex: 1,
-    color: colors.textPrimary,
-    fontSize: 15,
-    fontWeight: '600',
   },
 
   // Bottom
@@ -422,6 +328,7 @@ const styles = StyleSheet.create({
     color: '#047857',
     fontSize: 14,
     fontWeight: '600',
+    textAlign: 'center',
   },
   skeletonGroup: {
     marginTop: 24,
