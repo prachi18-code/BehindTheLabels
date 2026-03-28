@@ -1,4 +1,4 @@
-# EcoScan AI
+# BehindTheLabel
 
 A React Native (Expo) app that scans product barcodes with Google ML Kit via Vision Camera and displays carbon-footprint insights in a modern UI.
 
