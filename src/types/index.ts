@@ -6,10 +6,14 @@ export interface ScanResponse {
   carbonFootprint: string;
   ecoScore: EcoScore;
   impact: string;
+  nutritionStatus?: 'healthy' | 'unhealthy';
   alternatives: string[];
+  alternativesSource?: 'ai' | 'category-fallback' | 'default-fallback' | 'none';
   sugarLevel: string | null;
+  addedSugarLevel?: number | null;
   saturatedFatLevel: string | null;
   novaGroup: string | null;
+  nutriScore?: string | null;
   smartSummary: string;
 }
 

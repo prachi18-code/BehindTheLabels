@@ -27,6 +27,8 @@ npm install
 
 DATABASE_URL="postgresql://USER:PASSWORD@HOST.neon.tech/DB_NAME?sslmode=require"
 PORT=4000
+OPENROUTER_API_KEY="your-openrouter-key"
+OPENROUTER_MODEL="openai/gpt-oss-120b:free"
 
 3. Generate Prisma client:
 
@@ -59,12 +61,16 @@ Response shape:
   "carbonFootprint": "...",
   "ecoScore": "A-F",
   "impact": "Equivalent to driving X km",
-  "alternatives": []
+  "nutritionStatus": "healthy | unhealthy",
+  "smartSummary": "...",
+  "alternatives": [],
+  "nutriScore": "A-F or null"
 }
 
 ## Notes
 
 - Product data source: OpenFoodFacts
+- Nutrition verdict + healthier alternatives source: OpenRouter model (strict JSON mode)
 - Barcode history save is optional and never blocks core response
 - Timeouts are used on external API calls for faster responses
 
@@ -73,6 +79,8 @@ Response shape:
 1. Create a new Vercel project and set Root Directory to `backend`.
 2. Add environment variable in Vercel project settings:
   - `DATABASE_URL` (your Neon connection string)
+  - `OPENROUTER_API_KEY`
+  - `OPENROUTER_MODEL` (optional; default is `openai/gpt-oss-120b:free`)
 3. Deploy.
 
 After deploy, API endpoints will be:

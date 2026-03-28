@@ -13,7 +13,15 @@ const getParameterColor = (label: string | null) => {
   return '#10B981'; // Green
 };
 
+const getAlternativeSubtitle = (source?: ScanResponse['alternativesSource']) => {
+  if (source === 'ai') return 'Smart picks tailored for this product';
+  if (source === 'category-fallback') return 'Curated category swaps for healthier choices';
+  return 'Simple healthier swaps you can find easily';
+};
+
 export const ProductAnalysisCard = ({ product }: ProductAnalysisCardProps) => {
+  const shouldShowAlternatives = product.nutritionStatus === 'unhealthy' && product.alternatives.length > 0;
+
   return (
     <View style={styles.cardContainer}>
       {/* 🧠 SMART SUMMARY */}
@@ -64,6 +72,7 @@ export const ProductAnalysisCard = ({ product }: ProductAnalysisCardProps) => {
           <Text style={[styles.value, { color: getParameterColor(product.sugarLevel) }]}>
             {product.sugarLevel || 'N/A'}
           </Text>
+          <Text style={styles.subtext}>Added Sugar: {product.addedSugarLevel ?? 'N/A'} g</Text>
         </View>
       </View>
 
@@ -92,8 +101,28 @@ export const ProductAnalysisCard = ({ product }: ProductAnalysisCardProps) => {
           <Text style={[styles.value, { color: getParameterColor(product.novaGroup) }]}>
             {product.novaGroup || 'N/A'}
           </Text>
+          <Text style={styles.subtext}>Nutri-Score: {product.nutriScore || 'N/A'}</Text>
         </View>
       </View>
+
+      {shouldShowAlternatives ? (
+        <>
+          <View style={styles.divider} />
+          <Text style={styles.sectionTitle}>Healthier Alternatives</Text>
+          <Text style={styles.altSubtitle}>{getAlternativeSubtitle(product.alternativesSource)}</Text>
+
+          <View style={styles.alternativeList}>
+            {product.alternatives.map((item, index) => (
+              <View style={styles.alternativeCard} key={`${item}-${index}`}>
+                <View style={styles.rankBadge}>
+                  <Text style={styles.rankText}>{index + 1}</Text>
+                </View>
+                <Text style={styles.alternativeText}>{item}</Text>
+              </View>
+            ))}
+          </View>
+        </>
+      ) : null}
     </View>
   );
 };
@@ -179,5 +208,45 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#F1F5F9',
     marginVertical: 14,
+  },
+  altSubtitle: {
+    marginTop: -8,
+    marginBottom: 12,
+    color: '#64748B',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  alternativeList: {
+    gap: 10,
+  },
+  alternativeCard: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#D1FAE5',
+    backgroundColor: '#F0FDF4',
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rankBadge: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary,
+    marginRight: 10,
+  },
+  rankText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  alternativeText: {
+    flex: 1,
+    color: '#065F46',
+    fontSize: 15,
+    fontWeight: '700',
   },
 });

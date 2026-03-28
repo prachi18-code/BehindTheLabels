@@ -1,7 +1,7 @@
 const { fetchProductByBarcode } = require('../services/openFoodFactsService');
+const { analyzeNutritionWithAI } = require('../services/nutritionAnalysisService');
 const { saveScanHistory } = require('../services/scanHistoryService');
 const {
-  getAlternatives,
   getCarbonValue,
   getEcoScore,
   getImpact,
@@ -43,7 +43,24 @@ const scanBarcodeController = async (req, res, next) => {
     const sugarLevel = evaluateSugar(product.sugar100g);
     const saturatedFatLevel = evaluateSaturatedFat(product.saturatedFat100g);
     const novaGroup = evaluateNova(product.novaGroup);
-    const smartSummary = generateSmartSummary(ecoScore, sugarLevel, saturatedFatLevel, novaGroup);
+    const defaultSummary = generateSmartSummary(ecoScore, sugarLevel, saturatedFatLevel, novaGroup);
+
+    const nutritionAnalysis = await analyzeNutritionWithAI({
+      productName: product.productName,
+      category: product.category,
+      sugar100g: product.sugar100g,
+      addedSugar100g: product.addedSugar100g,
+      saturatedFat100g: product.saturatedFat100g,
+      novaGroup: product.novaGroup,
+      nutriScore: product.nutriScore,
+    });
+
+    if (nutritionAnalysis.alternativesSource === 'ai-unavailable') {
+      return res.status(503).json({
+        success: false,
+        message: 'AI alternatives are currently unavailable. Please try again later.',
+      });
+    }
 
     const payload = {
       success: true,
@@ -52,11 +69,15 @@ const scanBarcodeController = async (req, res, next) => {
       carbonFootprint: `${carbonValue} CO2`,
       ecoScore,
       impact: getImpact(carbonValue),
-      alternatives: getAlternatives(product.categories, product.productName),
+      alternatives: nutritionAnalysis.status === 'unhealthy' ? nutritionAnalysis.alternatives : [],
+      alternativesSource: nutritionAnalysis.alternativesSource || 'none',
+      nutritionStatus: nutritionAnalysis.status,
       sugarLevel,
+      addedSugarLevel: product.addedSugar100g,
       saturatedFatLevel,
       novaGroup,
-      smartSummary,
+      nutriScore: product.nutriScore,
+      smartSummary: nutritionAnalysis.verdict || defaultSummary,
     };
 
     saveScanHistory({
