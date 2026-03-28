@@ -55,13 +55,6 @@ const scanBarcodeController = async (req, res, next) => {
       nutriScore: product.nutriScore,
     });
 
-    if (nutritionAnalysis.alternativesSource === 'ai-unavailable') {
-      return res.status(503).json({
-        success: false,
-        message: 'AI alternatives are currently unavailable. Please try again later.',
-      });
-    }
-
     const payload = {
       success: true,
       productName: product.productName,
