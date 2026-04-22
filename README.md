@@ -2,7 +2,7 @@
 
 A React Native (Expo) app that scans product barcodes with Google ML Kit via Vision Camera and displays carbon-footprint insights in a modern UI.
 
-## Features
+## Core Features
 
 - Real-time barcode scanning with camera preview
 - Supported formats: EAN-13, UPC-A, Code-128
